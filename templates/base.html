@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/gh/auth0/jwt-decode/build/jwt-decode.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
 </head>
-<body>
+<body {% block onbeforeunload %}{% endblock %}>
     <nav id="nav">
         <div id="nav__logo">
             Notetaker

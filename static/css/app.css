@@ -32,6 +32,9 @@ body{
 #workspace__header{
     background: var(--intense-background);
     padding: 10px var(--width-padding);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .note{
@@ -115,4 +118,27 @@ body{
 .clone{
     opacity: 0.2;
     position: static;
+}
+
+.workspace__user{
+    background: white;
+    height: 30px;
+    border-radius: 100%;
+    cursor: pointer;
+}
+
+#workspace__users{
+    display: flex;
+    flex-direction: row;
+    column-gap: 10px;
+}
+
+.workspace__wrapper_user:hover::after{
+    content: attr(data-name);
+    position: fixed;
+    transform: translate(calc(-50% - 15px), 35px);
+    background: var(--darker-highlight);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
 }

@@ -4,6 +4,7 @@
     <div id="workspace__wrapper">
         <div id="workspace__header">
             <input value="Sample Test" id="workspace__name">
+            <div id="workspace__users"></div>
         </div>
         <div id="workspace">
             <div class="container t-chart">
@@ -75,5 +76,13 @@
         </div>
     </div>
 
+    <template id="template__user">
+        <div class="workspace__wrapper_user" data-name="andrew">
+            <img src="https://api.dicebear.com/8.x/identicon/svg?seed=andrew" class="workspace__user">
+        </div>
+    </template>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 {% endblock %}
+
+{% block onbeforeunload %} onbeforeunload='socket.emit("leave member", STATE.leave_code)'{% endblock %}

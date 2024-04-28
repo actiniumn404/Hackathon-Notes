@@ -3,7 +3,7 @@ from pymongo.server_api import ServerApi
 
 import json
 
-with open("structure.json") as raw_doc:
+with open("dev/structure.json") as raw_doc:
     document = json.loads(raw_doc.read())
 
 

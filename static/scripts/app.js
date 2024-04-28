@@ -47,17 +47,52 @@ STATE = {
         boundsBottom: undefined,
         find_overlaps: false
     },
-    height: undefined
+    height: undefined,
+    room: undefined,
+    leave_code: undefined
 }
 
 let socket = io.connect("http://localhost:5000/")
 socket.on('connect', function () {
-    console.log("Connected!")
+    console.log("Connected to websocket!")
+
+    let segments = new URL(location.href).pathname.split("/")
+    STATE.room = segments.pop() || segments.pop()
+
+    socket.emit("join room", {"room": STATE.room, "jwt": get_cookie("jwt")})
+
+    STATE.leave_code = {"room": STATE.room, "jwt": get_cookie("jwt")}
 })
 
 
-socket.on('Message', function (x) {
+socket.on('notes data', function (x) {
     console.log(x)
+})
+
+socket.on('error', function (x) {
+    console.log(x)
+})
+
+socket.on('new member', function (user) {
+    let clone = document.querySelector("#template__user").content.cloneNode(true)
+    clone.querySelector("div").setAttribute("data-name", user.username)
+    clone.querySelector("img").src = user.icon
+    document.querySelector("#workspace__users").prepend(clone)
+    notify(`"${user.username}" has joined the document`)
+})
+
+socket.on('member list', function (x) {
+    document.querySelector("#workspace__users").innerHTML = ""
+    for (let user of x) {
+        let clone = document.querySelector("#template__user").content.cloneNode(true)
+        clone.querySelector("div").setAttribute("data-name", user.username)
+        clone.querySelector("img").src = user.icon
+        document.querySelector("#workspace__users").prepend(clone)
+    }
+})
+
+socket.on('leave member', (user) => {
+    notify(`"${user.username}" has left the document`)
 })
 
 let declare_bounds = () => {
@@ -344,24 +379,27 @@ let regulate_position = (e, x, y) => {
     e.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px)`
 }
 
-window.addEventListener("mousedown", events.window_mousedown)
-window.addEventListener("mouseup", events.window_mouseup)
-window.addEventListener("mousemove", events.window_mousemove)
-window.addEventListener("resize", declare_bounds)
-
-document.body.addEventListener("DOMNodeInserted", e => {declare_events(e.target); e.target.querySelectorAll("*").forEach(declare_events)})
-
+let get_cookie = (cName) => {
+    const name = cName + "=";
+    const cDecoded = decodeURIComponent(document.cookie); //to be careful
+    const cArr = cDecoded.split('; ');
+    let res;
+    cArr.forEach(val => {
+        if (val.indexOf(name) === 0) res = val.substring(name.length);
+    })
+    return res
+}
 
 window.onload = () => {
     declare_bounds()
     STATE.height = document.getElementById("workspace").offsetHeight
-    document.querySelectorAll("*").forEach(declare_events)
+    document.querySelectorAll("#workspace *").forEach(declare_events)
+
+    document.querySelector("#workspace").addEventListener("mousedown", events.window_mousedown)
+    document.querySelector("#workspace").addEventListener("mouseup", events.window_mouseup)
+    document.querySelector("#workspace").addEventListener("mousemove", events.window_mousemove)
+    window.addEventListener("resize", declare_bounds)
+
+    document.getElementById("workspace").addEventListener("DOMNodeInserted", e => {declare_events(e.target); e.target.querySelectorAll("*").forEach(declare_events)})
 }
 
-
-/*let f = (x) => {
-    document.querySelector("#workspace").style.background = `white radial-gradient(black ${x * 2}px, transparent 0)`
-    document.querySelector("#workspace").style.backgroundSize = `${40 * x}px ${40 * x}px`
-    document.querySelector(".container").style.transform = `scale(${x})`
-    regulate_position(document.querySelector(".container"), 0, 0)
-}*/
