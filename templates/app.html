@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div id="workspace__wrapper">
+        <div id="workspace__header">
+            <input value="Sample Test" id="workspace__name">
+        </div>
+        <div id="workspace">
+            <div class="container t-chart">
+                <div class="container-group" style="order: 1;">
+                    <div class="container-group-header">Interlake High School</div>
+                    <div class="container-group-content">
+                        <div class="note" style="order: 1;">
+                            <div class="note_header">Header</div>
+                            <div class="note_content">
+                                <div class="subnote" style="order: 1;">Lorem Ipsum Dolor Sit Amet</div>
+                                <div class="subnote" style="order: 2;">Test2</div>
+                                <div class="subnote" style="order: 3;">Test3</div>
+                                <div class="subnote" style="order: 4;">Test4</div>
+                            </div>
+                        </div>
+                        <div class="note" style="order: 2;">
+                            <div class="note_header">Header</div>
+                            <div class="note_content">
+                                <div class="subnote" style="order: 1;">A</div>
+                                <div class="subnote" style="order: 2;">B</div>
+                                <div class="subnote" style="order: 3;">C</div>
+                                <div class="subnote" style="order: 4;">D</div>
+                            </div>
+                        </div>
+                        <div class="note" style="order: 3;">
+                            <div class="note_header">Header</div>
+                            <div class="note_content">
+                                <div class="subnote" style="order: 1;">W</div>
+                                <div class="subnote" style="order: 2;">X</div>
+                                <div class="subnote" style="order: 3;">Y</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-group" style="order: 2;">
+                    <div class="container-group-header">Newport High School</div>
+                    <div class="container-group-content">
+                        <div class="note" style="order: 1;">
+                            <div class="note_header">Header</div>
+                            <div class="note_content">
+                                <div class="subnote" style="order: 1;">Alpha</div>
+                                <div class="subnote" style="order: 2;">Beta</div>
+                                <div class="subnote" style="order: 3;">Gamma</div>
+                                <div class="subnote" style="order: 4;">Delta</div>
+                            </div>
+                        </div>
+                        <div class="note" style="order: 2;">
+                            <div class="note_header">Header</div>
+                            <div class="note_content">
+                                <div class="subnote" style="order: 1;">Test1</div>
+                                <div class="subnote" style="order: 2;">Test2</div>
+                                <div class="subnote" style="order: 3;">Test3</div>
+                                <div class="subnote" style="order: 4;">Test4</div>
+                            </div>
+                        </div>
+                        <div class="note" style="order: 3;">
+                            <div class="note_header">Header</div>
+                            <div class="note_content">
+                                <div class="subnote" style="order: 1;">Test1</div>
+                                <div class="subnote" style="order: 2;">Test2</div>
+                                <div class="subnote" style="order: 3;">Test3</div>
+                                <div class="subnote" style="order: 4;">Test4</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+{% endblock %}

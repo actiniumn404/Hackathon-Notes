@@ -1,0 +1,66 @@
+{
+    "users": {
+        "Andrew": "password"
+    },
+    "notes": {
+        "XIAJS": {
+            "name": "Sample Test",
+            "owner": "Andrew",
+            "components": [
+                {
+                    "type": "T-Chart",
+                    "children": [
+                        {
+                            "type": "T-Chart Component",
+                            "header": "Interlake High School",
+                            "children": [
+                                {
+                                    "type": "Note",
+                                    "children": [
+                                        {"content":  "Test1"},
+                                        {"content":  "Test2"},
+                                        {"content":  "Test3"},
+                                        {"content":  "Test4"}
+                                    ]
+                                },
+                                {
+                                    "type": "Note",
+                                    "children": [
+                                        {"content":  "Test1"},
+                                        {"content":  "Test2"},
+                                        {"content":  "Test3"},
+                                        {"content":  "Test4"}
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "T-Chart Component",
+                            "header": "Newport High School",
+                            "children": [
+                                {
+                                    "type": "Note",
+                                    "children": [
+                                        {"content":  "Test1"},
+                                        {"content":  "Test2"},
+                                        {"content":  "Test3"},
+                                        {"content":  "Test4"}
+                                    ]
+                                },
+                                {
+                                    "type": "Note",
+                                    "children": [
+                                        {"content":  "Test1"},
+                                        {"content":  "Test2"},
+                                        {"content":  "Test3"},
+                                        {"content":  "Test4"}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

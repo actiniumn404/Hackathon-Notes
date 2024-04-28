@@ -1,0 +1,361 @@
+let prompt = (data) => {
+    let elements = templates.prompt.content.cloneNode(true)
+
+    elements.querySelector(".modal__header .text").textContent = data.header
+
+    if (!data.description){
+        elements.querySelector(".modal__description").remove()
+    }else{
+        elements.querySelector(".modal__description").textContent = data.description
+    }
+
+    elements.querySelector(".modal__input").value = data.value ?? ""
+    elements.querySelector(".modal__input").placeholder = data.placeholder ?? ""
+
+    document.body.append(elements)
+
+    return new Promise((resolve, reject) => {
+        document.querySelector(".modal:last-of-type .accept").onclick = (() => {
+            let value = document.querySelector(".modal .modal__input:last-of-type").value
+            document.querySelector(".modal__wrapper:last-of-type").remove()
+            resolve(value)
+        })
+
+        document.querySelectorAll(".modal:last-of-type .close, .modal:last-of-type .deny").forEach(e=>e.onclick = (() => {
+            document.querySelector(".modal__wrapper:last-of-type").remove()
+            reject("Modal Closed")
+        }))
+    })
+}
+
+STATE = {
+    viewpoint: {
+        x: 0,
+        y: 0,
+        dilation: 1,
+        prev_x: 0,
+        prev_y: 0
+    },
+    drag: {
+        active: false,
+        element: undefined,
+        offsetX: undefined,
+        offsetY: undefined,
+        boundsTop: undefined,
+        boundsLeft: undefined,
+        boundsRight: undefined,
+        boundsBottom: undefined,
+        find_overlaps: false
+    },
+    height: undefined
+}
+
+let socket = io.connect("http://localhost:5000/")
+socket.on('connect', function () {
+    console.log("Connected!")
+})
+
+
+socket.on('Message', function (x) {
+    console.log(x)
+})
+
+let declare_bounds = () => {
+    let dimensions_wrapper = document.querySelector("#workspace").getBoundingClientRect()
+    STATE.drag.boundsLeft = dimensions_wrapper.left
+    STATE.drag.boundsTop = dimensions_wrapper.top
+    STATE.drag.boundsRight = dimensions_wrapper.right
+    STATE.drag.boundsBottom = dimensions_wrapper.bottom
+}
+
+// Straight from USACO Guide: https://usaco.guide/bronze/rect-geo?lang=cpp#implementation-2
+let find_intersection = (a, b) => { // {bottom left x, bottom left y, top right x, top right y}
+    let bl_a_x = a[0], bl_a_y = a[1], tr_a_x = a[2], tr_a_y = a[3];
+	let bl_b_x = b[0], bl_b_y = b[1], tr_b_x = b[2], tr_b_y = b[3];
+
+    if (bl_a_x >= tr_b_x || tr_a_x <= bl_b_x || bl_a_y >= tr_b_y ||
+	    tr_a_y <= bl_b_y) {
+		return -1;
+	} else {
+        return ((Math.min(tr_a_x, tr_b_x) - Math.max(bl_a_x, bl_b_x)) *
+	        (Math.min(tr_a_y, tr_b_y) - Math.max(bl_a_y, bl_b_y)));
+	}
+}
+
+
+let check_element = (e) => {
+    if (e.classList.contains("original")){
+        return false
+    }
+
+
+    for (let allowed of ["note", "subnote", "t-chart", "container"]){
+        if (e.classList.contains(allowed)){
+            return true
+        }
+    }
+
+    return false
+}
+
+let find_overlaps = (element) => {
+    let dimensions = element.getBoundingClientRect()
+    let element_state = [dimensions.left, dimensions.top, dimensions.right, dimensions.bottom]
+
+    let res = {
+        "subnote": [],
+        "note": [],
+        "container": []
+    }
+    document.getElementById("workspace").querySelectorAll("*").forEach(e => {
+        let d = e.getBoundingClientRect()
+        let area = find_intersection(element_state, [d.left, d.top, d.right, d.bottom])
+        if (area > 0 && check_element(e)){
+            if (e.classList.contains("subnote")){
+                res.subnote.push([area, e])
+            }else if (e.classList.contains("note")){
+                res.note.push([area, e])
+            }else if (e.classList.contains("container")){
+                res.container.push([area, e])
+            }
+        }
+    })
+
+    res.subnote.sort().reverse()
+    res.note.sort().reverse()
+    res.container.sort().reverse()
+
+    return res
+}
+
+
+let events = {
+    "container_mousedown": (e) => {
+        let dimensions = e.currentTarget.getBoundingClientRect()
+        STATE.drag.element = e.currentTarget
+        STATE.drag.element.classList.add("dragged")
+
+        declare_bounds()
+
+        STATE.drag.offsetX = e.pageX - dimensions.left
+        STATE.drag.offsetY = e.pageY - dimensions.top
+        STATE.drag.find_overlaps = false
+    },
+    "container_mouseup": (e) => {
+        STATE.drag.element.classList.remove("dragged")
+        STATE.drag.element = undefined
+    },
+    "note_mousedown": (e) => {
+        let element = e.currentTarget.cloneNode(true)
+        element.classList.add("original")
+        e.currentTarget.classList.add("clone")
+        Array.from(e.currentTarget.parentElement.children).at(-1).after(e.currentTarget)
+        document.getElementById("workspace").append(element)
+
+        element = document.querySelector(".note.original:last-of-type")
+        let dimensions = e.currentTarget.getBoundingClientRect()
+        STATE.drag.element = element
+        STATE.drag.element.classList.add("dragged")
+
+        declare_bounds()
+
+        STATE.drag.offsetX = e.pageX - dimensions.left
+        STATE.drag.offsetY = e.pageY - dimensions.top
+
+        element.style.top = e.pageY - STATE.drag.offsetY + "px"
+        element.style.left = e.pageX - STATE.drag.offsetX + "px"
+
+        e.stopPropagation()
+
+        STATE.drag.find_overlaps = true
+    },
+    "note_mouseup": (e) => {
+        let clones = document.querySelectorAll(".clone")
+
+        for (let i = 1; i < clones.length; i++){clones[i].remove()}
+
+        if (clones[0].style.display === "none"){ // direct child of "#workspace"
+            clones[0].remove()
+        }else{
+            clones[0].classList.remove("clone")
+            clones[0].classList.remove("dragged")
+            clones[0].classList.remove("original")
+            clones[0].style.top = ""
+            clones[0].style.left = ""
+            clones[0].style.display = "block"
+
+            STATE.drag.element.remove()
+        }
+
+        STATE.drag.element = undefined
+
+        e.stopPropagation()
+    },
+    "subnote_mousedown": (e) => {
+        let element = e.currentTarget.cloneNode(true)
+        element.classList.add("original")
+        e.currentTarget.classList.add("clone")
+        Array.from(e.currentTarget.parentElement.children).at(-1).after(e.currentTarget)
+        document.getElementById("workspace").append(element)
+
+        element = document.querySelector(".subnote.original:last-of-type")
+        let dimensions = e.currentTarget.getBoundingClientRect()
+        STATE.drag.element = element
+        STATE.drag.element.classList.add("dragged")
+
+        declare_bounds()
+
+        STATE.drag.offsetX = e.pageX - dimensions.left
+        STATE.drag.offsetY = e.pageY - dimensions.top
+
+        element.style.top = e.pageY - STATE.drag.offsetY + "px"
+        element.style.left = e.pageX - STATE.drag.offsetX + "px"
+
+        e.stopPropagation()
+
+        STATE.drag.find_overlaps = true
+    },
+    "subnote_mouseup": (e) => {
+        let clones = document.querySelectorAll(".clone")
+
+        for (let i = 1; i < clones.length; i++){clones[i].remove()}
+
+        if (clones[0].style.display === "none"){ // direct child of "#workspace"
+            clones[0].remove()
+        }else{
+            clones[0].classList.remove("clone")
+            clones[0].classList.remove("dragged")
+            clones[0].classList.remove("original")
+            clones[0].style.top = ""
+            clones[0].style.left = ""
+            clones[0].style.display = "block"
+
+            STATE.drag.element.remove()
+        }
+
+        STATE.drag.element = undefined
+
+        e.stopPropagation()
+    },
+    "window_mousedown": (e) => {
+        STATE.drag.active = true
+        STATE.viewpoint.prev_x = -e.pageX
+        STATE.viewpoint.prev_y = -e.pageY
+    },
+    "window_mouseup": (e) => {
+        STATE.drag.active = false
+    },
+    "window_mousemove": (e) => {
+        if (STATE.drag.active){
+            STATE.viewpoint.x += -e.pageX - STATE.viewpoint.prev_x
+            STATE.viewpoint.y += -e.pageY - STATE.viewpoint.prev_y
+            STATE.viewpoint.prev_x = -e.pageX
+            STATE.viewpoint.prev_y = -e.pageY
+        }
+        if (STATE.drag.element){
+            STATE.drag.element.style.top = e.pageY - STATE.drag.offsetY + "px"
+            STATE.drag.element.style.left = e.pageX - STATE.drag.offsetX + "px"
+
+            regulate_height(STATE.drag.element, 0, 0)
+
+            // Snap System
+            if (STATE.drag.find_overlaps){
+                let res = find_overlaps(STATE.drag.element)
+
+                let finished = false
+
+                let order;
+                if (STATE.drag.element.classList.contains("subnote")){
+                    order = [...res.subnote, ...res.note, ...res.container]
+                }else{
+                    order = [...res.note, ...res.container]
+                }
+
+                for (let node of order){
+                    if (node[1].parentElement.id === "workspace"){
+                        continue
+                    }
+                    if (node[1].classList.contains("clone")){
+                        finished = true
+                        break
+                    }
+
+                    let curOrder = Number(node[1].style.order)
+
+                    if (document.querySelector(".clone").parentElement === node[1].parentElement){
+                        console.log("Go")
+                        if (Number(document.querySelector(".clone").style.order) < curOrder){
+                            document.querySelector(".clone").style.order = curOrder
+                        }else{
+                            document.querySelector(".clone").style.order = curOrder - 1
+                        }
+                    }else{
+                        document.querySelector(".clone").style.display = "block"
+                        let element = document.querySelector(".clone").cloneNode(true)
+                        document.querySelectorAll(".clone").forEach(e=>e.remove())
+                        element.classList.add("clone")
+                        element.style.order = curOrder - 1
+                        node[1].parentElement.append(element)
+                    }
+
+                    finished = true
+                    break
+                }
+
+                if (!finished){
+                    document.querySelector(".clone").style.display = "none"
+                }
+            }
+        }
+    }
+}
+
+let declare_events = (e) => {
+    if (e.classList.contains("note")){
+        e.addEventListener("mousedown", events.note_mousedown)
+        e.addEventListener("mouseup", events.note_mouseup)
+    }
+    if (e.classList.contains("container")){
+        e.addEventListener("mousedown", events.container_mousedown)
+        e.addEventListener("mouseup", events.container_mouseup)
+    }
+    if (e.classList.contains("subnote")){
+        e.addEventListener("mousedown", events.subnote_mousedown)
+        e.addEventListener("mouseup", events.subnote_mouseup)
+    }
+    if (e.parentElement && e.parentElement.id === "workspace"){
+        regulate_height(e, 0, 0)
+    }
+}
+
+let regulate_height = (e, x, y) => {
+    let height = e.offsetHeight
+
+    if (e.scrollHeight > STATE.height){
+        e.style.height = STATE.height + "px"
+    }else{
+        e.style.height = "auto"
+    }
+
+    if (Number(e.style.top.substring(0, e.style.top.length - 2)) < STATE.drag.boundsTop){
+        e.style.top = STATE.drag.boundsTop + "px"
+        e.scrollTo(0, STATE.viewpoint.y)
+    }
+    if (Number(e.style.top.substring(0, e.style.top.length - 2)) + e.offsetHeight > STATE.drag.boundsBottom){
+        console.log(STATE.drag.boundsBottom, Number(e.style.top.substring(0, e.style.top.length - 2)))
+        e.style.top = STATE.drag.boundsBottom - Number(e.style.top.substring(0, e.style.top.length - 2)) + "px"
+    }
+}
+
+window.addEventListener("mousedown", events.window_mousedown)
+window.addEventListener("mouseup", events.window_mouseup)
+window.addEventListener("mousemove", events.window_mousemove)
+
+document.body.addEventListener("DOMNodeInserted", e => {declare_events(e.target); e.target.querySelectorAll("*").forEach(declare_events)})
+
+
+window.onload = () => {
+    declare_bounds()
+    STATE.height = document.getElementById("workspace").offsetHeight
+    document.querySelectorAll("*").forEach(declare_events)
+}

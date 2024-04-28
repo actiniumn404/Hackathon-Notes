@@ -1,0 +1,118 @@
+body{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: whitesmoke;
+}
+
+#workspace__wrapper{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+#workspace__name{
+    font-size: 16px;
+    background: none;
+    border: 0;
+    font-family: var(--header-font);
+}
+
+#workspace{
+    flex: 1;
+    margin: 50px;
+    background: white radial-gradient(black 2px, transparent 0);
+    background-size: 40px 40px;
+    background-position: -20px -20px;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+#workspace__header{
+    background: var(--intense-background);
+    padding: 10px var(--width-padding);
+}
+
+.note{
+    width: 500px;
+}
+
+.note_content{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 10px;
+    row-gap: 10px;
+    border: 1px solid black;
+    padding: 20px;
+    background: white;
+    justify-content: space-evenly;
+}
+
+.subnote{
+    background: #CDEEB0FF;
+    width: 200px;
+    padding: 10px;
+    aspect-ratio: 1;
+    border-top: 20px solid var(--note-green);
+}
+
+.note_header{
+    font-family: var(--header-font);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    background: var(--note-green);
+    padding: 15px 10px;
+    text-align: center;
+}
+
+.container-group{
+    width: 600px;
+}
+
+.container-group-content{
+    background: #e5f2ff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    row-gap: 30px;
+}
+
+.container-group-header{
+    background: #76abe7;
+    padding: 15px 10px;
+    font-family: var(--header-font);
+    font-weight: 600;
+    font-size: 20px;
+    text-align: center;
+}
+
+.container{
+    display: flex;
+    flex-direction: row;
+    column-gap: 20px;
+    background: white;
+    padding: 20px;
+    border: 1px solid black;
+    width: fit-content;
+    cursor: grabbing;
+}
+
+#workspace > *{
+    position: fixed;
+    overflow: hidden;
+}
+
+.dragged{
+    position: fixed;
+    overflow: hidden;
+}
+
+.clone{
+    opacity: 0.2;
+    position: static;
+}
