@@ -140,6 +140,7 @@ let events = {
         STATE.drag.offsetX = e.pageX - dimensions.left
         STATE.drag.offsetY = e.pageY - dimensions.top
         STATE.drag.find_overlaps = false
+        e.stopPropagation()
     },
     "container_mouseup": (e) => {
         STATE.drag.element.classList.remove("dragged")
@@ -239,24 +240,29 @@ let events = {
     },
     "window_mousedown": (e) => {
         STATE.drag.active = true
-        STATE.viewpoint.prev_x = -e.pageX
-        STATE.viewpoint.prev_y = -e.pageY
+        STATE.viewpoint.prev_x = e.pageX
+        STATE.viewpoint.prev_y = e.pageY
     },
     "window_mouseup": (e) => {
         STATE.drag.active = false
     },
     "window_mousemove": (e) => {
         if (STATE.drag.active){
-            STATE.viewpoint.x += -e.pageX - STATE.viewpoint.prev_x
-            STATE.viewpoint.y += -e.pageY - STATE.viewpoint.prev_y
-            STATE.viewpoint.prev_x = -e.pageX
-            STATE.viewpoint.prev_y = -e.pageY
+            STATE.viewpoint.x += e.pageX - STATE.viewpoint.prev_x
+            STATE.viewpoint.y += e.pageY - STATE.viewpoint.prev_y
+            STATE.viewpoint.prev_x = e.pageX
+            STATE.viewpoint.prev_y = e.pageY
+
+            for (let e of document.querySelectorAll("#workspace > *")){
+                regulate_position(e, 0, 0)
+            }
+
+            document.getElementById("workspace").style.backgroundPositionX = STATE.viewpoint.x + "px"
+            document.getElementById("workspace").style.backgroundPositionY = STATE.viewpoint.y + "px"
         }
         if (STATE.drag.element){
             STATE.drag.element.style.top = e.pageY - STATE.drag.offsetY + "px"
             STATE.drag.element.style.left = e.pageX - STATE.drag.offsetX + "px"
-
-            regulate_height(STATE.drag.element, 0, 0)
 
             // Snap System
             if (STATE.drag.find_overlaps){
@@ -324,32 +330,24 @@ let declare_events = (e) => {
         e.addEventListener("mouseup", events.subnote_mouseup)
     }
     if (e.parentElement && e.parentElement.id === "workspace"){
-        regulate_height(e, 0, 0)
+        regulate_position(e, 0, 0)
     }
 }
 
-let regulate_height = (e, x, y) => {
-    let height = e.offsetHeight
-
-    if (e.scrollHeight > STATE.height){
-        e.style.height = STATE.height + "px"
-    }else{
-        e.style.height = "auto"
-    }
-
-    if (Number(e.style.top.substring(0, e.style.top.length - 2)) < STATE.drag.boundsTop){
-        e.style.top = STATE.drag.boundsTop + "px"
-        e.scrollTo(0, STATE.viewpoint.y)
-    }
-    if (Number(e.style.top.substring(0, e.style.top.length - 2)) + e.offsetHeight > STATE.drag.boundsBottom){
-        console.log(STATE.drag.boundsBottom, Number(e.style.top.substring(0, e.style.top.length - 2)))
-        e.style.top = STATE.drag.boundsBottom - Number(e.style.top.substring(0, e.style.top.length - 2)) + "px"
-    }
+let regulate_position = (e, x, y) => {
+    e.style.top = STATE.drag.boundsTop + STATE.viewpoint.y + y + "px"
+    e.style.left = STATE.drag.boundsLeft + STATE.viewpoint.x + x + "px"
+    let top = Math.max(-STATE.viewpoint.y + y, 0)
+    let left = Math.max(-STATE.viewpoint.x + x, 0)
+    let right = Math.max((STATE.drag.boundsLeft + STATE.viewpoint.x + x + e.offsetWidth- STATE.drag.boundsRight), 0)
+    let bottom = Math.max((STATE.drag.boundsTop + STATE.viewpoint.y + e.offsetHeight - STATE.drag.boundsBottom), 0)
+    e.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px)`
 }
 
 window.addEventListener("mousedown", events.window_mousedown)
 window.addEventListener("mouseup", events.window_mouseup)
 window.addEventListener("mousemove", events.window_mousemove)
+window.addEventListener("resize", declare_bounds)
 
 document.body.addEventListener("DOMNodeInserted", e => {declare_events(e.target); e.target.querySelectorAll("*").forEach(declare_events)})
 
@@ -359,3 +357,11 @@ window.onload = () => {
     STATE.height = document.getElementById("workspace").offsetHeight
     document.querySelectorAll("*").forEach(declare_events)
 }
+
+
+/*let f = (x) => {
+    document.querySelector("#workspace").style.background = `white radial-gradient(black ${x * 2}px, transparent 0)`
+    document.querySelector("#workspace").style.backgroundSize = `${40 * x}px ${40 * x}px`
+    document.querySelector(".container").style.transform = `scale(${x})`
+    regulate_position(document.querySelector(".container"), 0, 0)
+}*/

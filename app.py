@@ -14,6 +14,7 @@ socketio.init_app(app, cors_allowed_origins="*")
 def page_home():
     return render_template("app.html", name="app")
 
+
 @socketio.on('connect')
 def socket_connect():
     emit("Message", "yay!")

@@ -9,6 +9,8 @@
             "components": [
                 {
                     "type": "T-Chart",
+                    "x": 0,
+                    "y": 0,
                     "children": [
                         {
                             "type": "T-Chart Component",
@@ -17,19 +19,19 @@
                                 {
                                     "type": "Note",
                                     "children": [
-                                        {"content":  "Test1"},
-                                        {"content":  "Test2"},
-                                        {"content":  "Test3"},
-                                        {"content":  "Test4"}
+                                        {"type": "Subnote", "content":  "Test1"},
+                                        {"type": "Subnote", "content":  "Test2"},
+                                        {"type": "Subnote", "content":  "Test3"},
+                                        {"type": "Subnote", "content":  "Test4"}
                                     ]
                                 },
                                 {
                                     "type": "Note",
                                     "children": [
-                                        {"content":  "Test1"},
-                                        {"content":  "Test2"},
-                                        {"content":  "Test3"},
-                                        {"content":  "Test4"}
+                                        {"type": "Subnote", "content":  "Test1"},
+                                        {"type": "Subnote", "content":  "Test2"},
+                                        {"type": "Subnote", "content":  "Test3"},
+                                        {"type": "Subnote", "content":  "Test4"}
                                     ]
                                 }
                             ]
@@ -41,19 +43,19 @@
                                 {
                                     "type": "Note",
                                     "children": [
-                                        {"content":  "Test1"},
-                                        {"content":  "Test2"},
-                                        {"content":  "Test3"},
-                                        {"content":  "Test4"}
+                                        {"type": "Subnote", "content":  "Test1"},
+                                        {"type": "Subnote", "content":  "Test2"},
+                                        {"type": "Subnote", "content":  "Test3"},
+                                        {"type": "Subnote", "content":  "Test4"}
                                     ]
                                 },
                                 {
                                     "type": "Note",
                                     "children": [
-                                        {"content":  "Test1"},
-                                        {"content":  "Test2"},
-                                        {"content":  "Test3"},
-                                        {"content":  "Test4"}
+                                        {"type": "Subnote", "content":  "Test1"},
+                                        {"type": "Subnote", "content":  "Test2"},
+                                        {"type": "Subnote", "content":  "Test3"},
+                                        {"type": "Subnote", "content":  "Test4"}
                                     ]
                                 }
                             ]
