@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify, make_response, redir
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
 import jwt
 import pymongo
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 import os
 
 app = Flask(__name__)
@@ -11,6 +13,23 @@ socketio = SocketIO(app)
 socketio.init_app(app, cors_allowed_origins="*")
 
 STATE = {"USERS": {}}
+
+
+def get_db():
+    uri = "mongodb+srv://andrewchen10:sK7MP0Ilnqkl1dik@hackathondecisions.dft0zvl.mongodb.net/?retryWrites=true&w=majority&appName=HackathonDecisions"
+    client = MongoClient(uri, server_api=ServerApi('1'))
+
+    try:
+        client.admin.command('ping')
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+    except Exception as e:
+        print(e)
+
+    return client["database"]
+
+
+db = get_db()
+
 
 def check(token):
     try:
@@ -27,6 +46,16 @@ def page_home(room):
         return redirect("/login?err=invalid")
 
     return render_template("app.html", name="app")
+
+
+@app.route('/signup')
+def page_signup():
+    return render_template("signup.html", name="signup")
+
+
+@app.route('/login')
+def page_login():
+    return render_template("login.html", name="login")
 
 
 @app.route('/api/signup', methods=["POST"])
@@ -58,9 +87,15 @@ def socket_join_room(data):
 
     STATE["USERS"][room].append(decoded)
 
+    try:
+        room_data = next(db["notes"].find({"name": room}))
+    except StopIteration:
+        emit("error", "Invalid Room", to=request.sid)
+        return
+
     join_room(room)
     emit("new member", decoded, to=room)
-    emit("notes data", decoded, to=request.sid)
+    emit("notes data", room_data["data"], to=request.sid)
     emit("member list", STATE["USERS"][room], to=request.sid)
 
 

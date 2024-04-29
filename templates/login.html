@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div id="wrapper">
+        <form id="signup" method="post" action="/api/login">
+            <h1>Login into Notetaker</h1>
+            <label for="username">
+                Username
+                <input type="text" name="username" required pattern="[A-Za-z0-9]{1, 40}" title="Between 1 and 40 alphanumerical characters">
+            </label>
+            <label for="password">
+                Password
+                <input name="password" type="password" id="password" required pattern="^.{1,40}$" title="At most 40 characters">
+            </label>
+            <button>Log In!</button>
+        </form>
+    </div>
+
+{% endblock %}

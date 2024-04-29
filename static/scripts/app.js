@@ -45,11 +45,14 @@ STATE = {
         boundsLeft: undefined,
         boundsRight: undefined,
         boundsBottom: undefined,
-        find_overlaps: false
+        find_overlaps: false,
+        orig: undefined
     },
     height: undefined,
     room: undefined,
-    leave_code: undefined
+    leave_code: undefined,
+    data: undefined,
+    components: {}
 }
 
 let socket = io.connect("http://localhost:5000/")
@@ -66,7 +69,8 @@ socket.on('connect', function () {
 
 
 socket.on('notes data', function (x) {
-    console.log(x)
+    STATE.data = x
+    construct_from_root(STATE.data)
 })
 
 socket.on('error', function (x) {
@@ -188,10 +192,16 @@ let events = {
         Array.from(e.currentTarget.parentElement.children).at(-1).after(e.currentTarget)
         document.getElementById("workspace").append(element)
 
+        STATE.data.components.push(STATE.components[e.currentTarget.getAttribute("data-id")])
+
+        STATE.drag.orig = STATE.components[e.currentTarget.getAttribute("data-id")]
+        STATE.components[e.currentTarget.getAttribute("data-id")] = STATE.data.components.at(-1)
+
         element = document.querySelector(".note.original:last-of-type")
         let dimensions = e.currentTarget.getBoundingClientRect()
         STATE.drag.element = element
         STATE.drag.element.classList.add("dragged")
+        e.currentTarget.id += "_C"
 
         declare_bounds()
 
@@ -219,6 +229,9 @@ let events = {
             clones[0].style.top = ""
             clones[0].style.left = ""
             clones[0].style.display = "block"
+            clones[0].id = clones[0].id.substring(0, clones[0].id.length - 2)
+            STATE.components[clones[0].getAttribute("data-id")] = STATE.drag.orig
+            STATE.data.components.splice(STATE.data.components.length - 1, 1)
 
             STATE.drag.element.remove()
         }
@@ -234,10 +247,16 @@ let events = {
         Array.from(e.currentTarget.parentElement.children).at(-1).after(e.currentTarget)
         document.getElementById("workspace").append(element)
 
+        STATE.data.components.push(STATE.components[e.currentTarget.getAttribute("data-id")])
+
+        STATE.drag.orig = STATE.components[e.currentTarget.getAttribute("data-id")]
+        STATE.components[e.currentTarget.getAttribute("data-id")] = STATE.data.components.at(-1)
+
         element = document.querySelector(".subnote.original:last-of-type")
         let dimensions = e.currentTarget.getBoundingClientRect()
         STATE.drag.element = element
         STATE.drag.element.classList.add("dragged")
+        e.currentTarget.id += "_C"
 
         declare_bounds()
 
@@ -265,6 +284,9 @@ let events = {
             clones[0].style.top = ""
             clones[0].style.left = ""
             clones[0].style.display = "block"
+            clones[0].id = clones[0].id.substring(0, clones[0].id.length - 2)
+            STATE.components[clones[0].getAttribute("data-id")] = STATE.drag.orig
+            STATE.data.components.splice(STATE.data.components.length - 1, 1)
 
             STATE.drag.element.remove()
         }
@@ -288,16 +310,19 @@ let events = {
             STATE.viewpoint.prev_x = e.pageX
             STATE.viewpoint.prev_y = e.pageY
 
-            for (let e of document.querySelectorAll("#workspace > *")){
-                regulate_position(e, 0, 0)
+            for (let e of STATE.data.components){
+                regulate_position(document.getElementById("COMPONENT_" + e.id), e.x, e.y)
             }
 
             document.getElementById("workspace").style.backgroundPositionX = STATE.viewpoint.x + "px"
             document.getElementById("workspace").style.backgroundPositionY = STATE.viewpoint.y + "px"
         }
         if (STATE.drag.element){
-            STATE.drag.element.style.top = e.pageY - STATE.drag.offsetY + "px"
-            STATE.drag.element.style.left = e.pageX - STATE.drag.offsetX + "px"
+            //STATE.drag.element.style.top = e.pageY - STATE.drag.offsetY + "px"
+            //STATE.drag.element.style.left = e.pageX - STATE.drag.offsetX + "px"
+            let id = STATE.drag.element.getAttribute("data-id")
+            STATE.components[id].y = STATE.viewpoint.y + e.pageY - STATE.drag.offsetY - STATE.drag.boundsTop
+            STATE.components[id].x = STATE.viewpoint.x + e.pageX - STATE.drag.offsetX - STATE.drag.boundsLeft
 
             // Snap System
             if (STATE.drag.find_overlaps){
@@ -347,6 +372,7 @@ let events = {
                     document.querySelector(".clone").style.display = "none"
                 }
             }
+            regulate_position(document.getElementById("COMPONENT_" + id), STATE.components[id].x, STATE.components[id].y)
         }
     }
 }
@@ -372,10 +398,10 @@ let declare_events = (e) => {
 let regulate_position = (e, x, y) => {
     e.style.top = STATE.drag.boundsTop + STATE.viewpoint.y + y + "px"
     e.style.left = STATE.drag.boundsLeft + STATE.viewpoint.x + x + "px"
-    let top = Math.max(-STATE.viewpoint.y + y, 0)
-    let left = Math.max(-STATE.viewpoint.x + x, 0)
+    let top = Math.max(-STATE.viewpoint.y - y, 0)
+    let left = Math.max(-STATE.viewpoint.x - x, 0)
     let right = Math.max((STATE.drag.boundsLeft + STATE.viewpoint.x + x + e.offsetWidth- STATE.drag.boundsRight), 0)
-    let bottom = Math.max((STATE.drag.boundsTop + STATE.viewpoint.y + e.offsetHeight - STATE.drag.boundsBottom), 0)
+    let bottom = Math.max((STATE.drag.boundsTop + STATE.viewpoint.y + y + e.offsetHeight - STATE.drag.boundsBottom), 0)
     e.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px)`
 }
 
@@ -390,14 +416,127 @@ let get_cookie = (cName) => {
     return res
 }
 
+let construct_tchart = (data) => {
+    let chart = document.createElement("DIV")
+    chart.classList.add("container")
+    chart.classList.add("t-chart")
+    chart.id = "COMPONENT_" + data.id
+    chart.setAttribute("data-id", data.id)
+
+    STATE.components[data.id] = data
+
+    let i = 1;
+    for (let child of data.children){
+        let part = document.createElement("DIV")
+        part.classList.add("container-group")
+        part.style.order = i;
+
+        part.id = "COMPONENT_" + child.id
+        part.setAttribute("data-id", child.id)
+        STATE.components[child.id] = child
+
+        let name = document.createElement("DIV")
+        name.classList.add("container-group-header")
+        name.innerText = child.header
+
+        part.append(name)
+
+        let content = document.createElement("DIV")
+        content.classList.add("container-group-content")
+
+        let j = 1;
+        for (let grandchild of child.children){
+            let x = construct(grandchild)
+            x.style.order = j;
+            content.append(x)
+            j += 1
+        }
+
+        part.append(content)
+
+        chart.append(part)
+
+        i += 1;
+    }
+
+    return chart
+}
+
+let construct_note = (data) => {
+    let chart = document.createElement("DIV")
+    chart.classList.add("note")
+
+    chart.id = "COMPONENT_" + data.id
+    chart.setAttribute("data-id", data.id)
+
+    STATE.components[data.id] = data
+
+    let header = document.createElement("DIV")
+    header.classList.add("note_header")
+    header.innerText += data.header
+
+    chart.append(header)
+
+    let content = document.createElement("DIV")
+    content.classList.add("note_content")
+
+    let i = 1;
+    for (let child of data.children){
+        let x = construct(child)
+        x.style.order = i
+        content.append(x)
+        i += 1
+    }
+
+    chart.append(content)
+
+    return chart
+}
+
+let construct_subnote = (data) => {
+    let note = document.createElement("DIV")
+    note.classList.add("subnote")
+    note.innerText = data.content
+
+    STATE.components[data.id] = data
+
+    note.id = "COMPONENT_" + data.id
+    note.setAttribute("data-id", data.id)
+
+    return note
+}
+
+let construct_from_root = (data) => {
+    // Metadata Setup
+    document.querySelector("#workspace__name").value = data.name
+
+    console.log(data, data.components)
+    // Construction
+    for (let component of data.components){
+        document.getElementById("workspace").append(construct(component))
+    }
+}
+
+let construct = (data) => {
+    if (data.type === "T-Chart"){
+        return construct_tchart(data)
+    }
+    if (data.type === "Note"){
+        return construct_note(data)
+    }
+    if (data.type === "Subnote"){
+        return construct_subnote(data)
+    }
+}
+
 window.onload = () => {
     declare_bounds()
     STATE.height = document.getElementById("workspace").offsetHeight
     document.querySelectorAll("#workspace *").forEach(declare_events)
 
-    document.querySelector("#workspace").addEventListener("mousedown", events.window_mousedown)
-    document.querySelector("#workspace").addEventListener("mouseup", events.window_mouseup)
-    document.querySelector("#workspace").addEventListener("mousemove", events.window_mousemove)
+    document.querySelector("#workspace__wrapper").addEventListener("mousedown", events.window_mousedown)
+    document.querySelector("#workspace__wrapper").addEventListener("mouseup", events.window_mouseup)
+    document.querySelector("#workspace__wrapper").addEventListener("mousemove", events.window_mousemove)
     window.addEventListener("resize", declare_bounds)
 
     document.getElementById("workspace").addEventListener("DOMNodeInserted", e => {declare_events(e.target); e.target.querySelectorAll("*").forEach(declare_events)})

@@ -17,11 +17,13 @@ def get_db():
     except Exception as e:
         print(e)
 
-    return client
+    return client["database"]
 
 
 db = get_db()["database"]
-print(db)
 
-db["users"].insert_one(document["users"])
-db["notes"].insert_one(document["notes"])
+#db["users"].insert_one(document["users"])
+db["notes"].insert_one(document["notes"][0])
+
+for item in db["notes"].find({"name": "XIAJS"}):
+    print(item)

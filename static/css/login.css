@@ -1,0 +1,91 @@
+nav{
+    z-index: 5;
+}
+
+#signup{
+    width: 500px;
+    background: #f8dfb5;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    height: fit-content;
+    margin-top: 100px;
+    border-radius: 4px;
+    z-index: 5;
+}
+
+body{
+    background: floralwhite;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    filter: alpha(opacity=100);
+}
+
+body::after{
+    content: "";
+    background: url("../../static/notebooks.png");
+    background-size: 1000px;
+    opacity: 0.1;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+#wrapper{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+h1{
+    font-family: var(--header-font);
+    margin: 10px 0;
+}
+
+label{
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+    column-gap: 5px;
+    font-weight: 600;
+}
+
+label[for="agree"]{
+    flex-direction: row;
+    font-weight: 400;
+    user-select: none;
+    align-items: baseline;
+}
+
+input{
+    padding: 10px 15px;
+    font-size: 17px;
+    border-radius: 4px;
+    border: 1px solid #313131;
+    outline: none;
+}
+
+button{
+    width: fit-content;
+    padding: 10px 15px;
+    font-size: 17px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    background: var(--darker-highlight);
+    color: whitesmoke;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+button:hover{
+    opacity: 0.8;
+}
+
+button:active{
+    opacity: 0.5;
+}

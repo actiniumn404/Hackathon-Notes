@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div id="wrapper">
+        <form id="signup" method="post" action="/api/login">
+            <h1>Sign up for Notetaker</h1>
+            <label for="username">
+                Username
+                <input name="username" required pattern="^[A-Za-z0-9]{1,40}$" title="Between 1 and 40 alphanumerical characters">
+            </label>
+            <label for="password">
+                Password
+                <input name="password" type="password" id="password" required pattern="^.{1,40}$" title="At most 40 characters">
+            </label>
+            <label for="repeat-password">
+                Repeat Password
+                <input name="repeat-password" type="password" id="repeat-password" required pattern="^.{1,40}$" title="At most 40 characters">
+            </label>
+            <label for="agree">
+                <input name="agree" type="checkbox" id="agree" required>
+                I agree to the Terms and Services (which are currently nonexistent) and will heed to them.
+            </label>
+            <button>Sign Up!</button>
+        </form>
+    </div>
+
+{% endblock %}
