@@ -1,86 +1,108 @@
 {
-    "users": {
-        "Andrew": "password"
+    "_id": {
+        "$oid": "662ebd54bc783a24522fd658"
     },
-    "notes": [
-        {"name": "XIAJS",
-        "data": {
-            "name": "Sample Test",
-            "owner": "Andrew",
-            "components": [
-                {
-                    "type": "T-Chart",
-                    "x": 0,
-                    "y": 0,
-                    "color": "blue",
-                    "id": "XIFk7xJ",
-                    "children": [
-                        {
-                            "type": "T-Chart Component",
-                            "id": "uLKfk2z",
-                            "header": "Interlake High School",
-                            "children": [
-                                {"type": "Subnote", "content":  "Test1", "color":  "green", "id": "1rT8mnA"},
-                                {
-                                    "type": "Note",
-                                    "header": "Header",
-                                    "color": "blue",
-                                    "id": "kQj02ir",
-                                    "children": [
-                                        {"type": "Subnote", "content":  "Test1", "color":  "green", "id": "fHT3MWQ"},
-                                        {"type": "Subnote", "content":  "Test2", "color":  "green", "id": "uyzwVmh"},
-                                        {"type": "Subnote", "content":  "Test3", "color":  "green", "id": "hk4dscy"},
-                                        {"type": "Subnote", "content":  "Test4", "color":  "green", "id": "7P0Yw2F"}
-                                    ]
-                                },
-                                {
-                                    "type": "Note",
-                                    "header": "Header",
-                                    "color": "blue",
-                                    "id": "PCs2AbG",
-                                    "children": [
-                                        {"type": "Subnote", "content":  "Test1", "color":  "green", "id": "SwP2bz8"},
-                                        {"type": "Subnote", "content":  "Test2", "color":  "green", "id": "E3nHvx1"},
-                                        {"type": "Subnote", "content":  "Test3", "color":  "green", "id": "joZ0MzR"},
-                                        {"type": "Subnote", "content":  "Test4", "color":  "green", "id": "H5Vo7ZW"}
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "type": "T-Chart Component",
-                            "header": "Newport High School",
-                            "id": "V5YKxUO",
-                            "children": [
-                                {
-                                    "type": "Note",
-                                    "header": "Header",
-                                    "color": "blue",
-                                    "id": "XGKtlP9",
-                                    "children": [
-                                        {"type": "Subnote", "content":  "Test1", "color":  "green", "id": "PejA1Br"},
-                                        {"type": "Subnote", "content":  "Test2", "color":  "green", "id": "13fgjuR"},
-                                        {"type": "Subnote", "content":  "Test3", "color":  "green", "id": "1R8eOGz"},
-                                        {"type": "Subnote", "content":  "Test4", "color":  "green", "id": "X7nZcCd"}
-                                    ]
-                                },
-                                {
-                                    "type": "Note",
-                                    "header": "Header",
-                                    "color": "blue",
-                                    "id": "rWz59o0",
-                                    "children": [
-                                        {"type": "Subnote", "content":  "Test1", "color":  "green", "id": "4xrMIlb"},
-                                        {"type": "Subnote", "content":  "Test2", "color":  "green", "id": "lsIqHr3"},
-                                        {"type": "Subnote", "content":  "Test3", "color":  "green", "id": "8sugZ07"},
-                                        {"type": "Subnote", "content":  "Test4", "color":  "green", "id": "jHemFN0"}
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    }]
-}
+    "name": "XIAJS",
+    "data": {
+        "name": "Sample Test",
+        "owner": "Andrew",
+        "components": [
+            {
+                "type": "T-Chart",
+                "x": 0,
+                "y": 0,
+                "color": "blue",
+                "id": "XIFk7xJ",
+                "children": [
+                    {
+                        "type": "T-Chart Component",
+                        "id": "uLKfk2z",
+                        "header": "Newport High School",
+                        "children": [
+                            {
+                                "type": "Subnote",
+                                "content": "AP Program",
+                                "color": "green",
+                                "id": "1rT8mnA"
+                            },
+                            {
+                                "type": "Note",
+                                "header": "Academics",
+                                "color": "blue",
+                                "id": "kQj02ir",
+                                "children": [
+                                    {
+                                        "type": "Subnote",
+                                        "content": "Lots of old Tyee friends",
+                                        "color": "green",
+                                        "id": "fHT3MWQ"
+                                    },
+                                    {
+                                        "type": "Subnote",
+                                        "content": "More relaxed, flexible schedule",
+                                        "color": "green",
+                                        "id": "uyzwVmh"
+                                    },
+                                    {
+                                        "type": "Subnote",
+                                        "content": "A lot of time for various extracurriculars (volunteering at Tyee, etc.)",
+                                        "color": "green",
+                                        "id": "hk4dscy"
+                                    },
+                                    {
+                                        "type": "Subnote",
+                                        "content": "Lots of clubs!\n",
+                                        "color": "green",
+                                        "id": "7P0Yw2F"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "T-Chart Component",
+                        "header": "Interlake High School",
+                        "id": "V5YKxUO",
+                        "children": [
+                            {
+                                "type": "Subnote",
+                                "content": "AP Program",
+                                "color": "green",
+                                "id": "1rT8mnA"
+                            },
+                            {
+                                "type": "Note",
+                                "header": "Student Life",
+                                "color": "blue",
+                                "id": "PCs2AbG",
+                                "children": [
+                                    {
+                                        "type": "Subnote",
+                                        "content": "Extremely successful and \"good\" clubs (Science Bowl)",
+                                        "color": "green",
+                                        "id": "SwP2bz8"
+                                    },
+                                    {
+                                        "type": "Subnote",
+                                        "content": "Get to meet very smart people",
+                                        "color": "green",
+                                        "id": "E3nHvx1"
+                                    },
+                                    {
+                                        "type": "Subnote",
+                                        "content": "School/Life Balance is nonexistent in IB",
+                                        "color": "green",
+                                        "id": "joZ0MzR"
+                                    },
+                                    {
+                                        "type": "Subnote",
+                                        "content": "IB somewhat prepares for college",
+                                        "color": "green",
+                                        "id": "H5Vo7ZW"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }]}}

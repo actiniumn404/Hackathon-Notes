@@ -726,6 +726,10 @@ document.getElementById("addcomparison").onclick = async () => {
     construct_from_root(STATE.data)
 }
 
+document.getElementById("workspace__name").onchange = () => {
+    STATE.data.name = document.getElementById("workspace__name").value
+}
+
 window.onload = () => {
     declare_bounds()
     STATE.height = document.getElementById("workspace").offsetHeight
