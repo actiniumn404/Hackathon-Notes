@@ -2,6 +2,7 @@ import datetime
 import math
 import urllib.parse
 import os
+import json
 
 from flask import Flask, render_template, request, jsonify, make_response, redirect
 from flask_socketio import SocketIO, emit, join_room, leave_room, send
@@ -46,10 +47,11 @@ def check(token):
 def page_home(room):
     if not "jwt" in request.cookies:
         return redirect("/login")
-    if not check(request.cookies.get("jwt")):
+    res = check(request.cookies.get("jwt"))
+    if not res:
         return redirect("/login?err=invalid")
 
-    return render_template("app.html", name="app")
+    return render_template("app.html", name="app", JWT=json.dumps(res), NAME=res["username"])
 
 
 @app.route('/signup')
@@ -178,6 +180,7 @@ def socket_join_room(data):
     emit("new member", decoded, to=room)
     emit("notes data", room_data["data"], to=request.sid)
     emit("member list", STATE["USERS"][room], to=request.sid)
+    emit("SID", request.sid, to=request.sid)
 
 
 @socketio.on("leave member")
@@ -211,6 +214,15 @@ def socket_leave_room(data):
     leave_room(room)
     emit("leave member", decoded, to=room)
     emit("member list", STATE["USERS"][room], to=room)
+
+@socketio.on('relay data')
+def socket_emit(data):
+    emit("relay data", data, to=data["room"])
+    db["notes"].replace_one({"name": data["room"]}, {
+        "name": data["room"],
+        "data": json.loads(data["data"])
+    })
+
 
 @socketio.on('connect')
 def socket_connect():

@@ -19,11 +19,17 @@
         <div id="nav__logo">
             Notetaker
         </div>
+        {% if not NAME %}
         <div id="nav__right">
             <div><a href="/dashboard">Dashboard</a></div>
             <div><a href="/login">Login</a></div>
             <div><a href="/signup">Signup</a></div>
         </div>
+        {% else %}
+            <div id="nav__right">
+                <div><a href="/dashboard">{{ NAME }}: Dashboard</a></div>
+            </div>
+        {% endif %}
     </nav>
     {% block content %}{% endblock %}
 

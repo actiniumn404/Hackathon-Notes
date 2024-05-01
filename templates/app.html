@@ -16,6 +16,10 @@
         </div>
     </div>
 
+    <script>
+        JWT = JSON.parse(`{{ JWT | safe }}`)
+    </script>
+
     <template id="template__user">
         <div class="workspace__wrapper_user" data-name="andrew">
             <img src="https://api.dicebear.com/8.x/identicon/svg?seed=andrew" class="workspace__user">

@@ -79,6 +79,19 @@ socket.on('notes data', function (x) {
     construct_from_root(STATE.data)
 })
 
+socket.on('SID', function (x) {
+    UID = x
+})
+
+socket.on('relay data', function (x) {
+    if (x.sender === UID){
+        return
+    }
+    STATE.data = JSON.parse(x.data)
+    STATE.old = JSON.stringify(STATE.data)
+    construct_from_root(STATE.data)
+})
+
 socket.on('error', function (x) {
     console.log(x)
 })
@@ -724,5 +737,16 @@ window.onload = () => {
     window.addEventListener("resize", declare_bounds)
 
     document.getElementById("workspace").addEventListener("DOMNodeInserted", e => {declare_events(e.target); e.target.querySelectorAll("*").forEach(declare_events)})
+
+    STATE.old = JSON.stringify(STATE.data)
+    STATE.interval = setInterval(() => {
+        let new_state = JSON.stringify(STATE.data)
+
+        if (new_state !== STATE.old){
+            socket.emit("relay data", {room: STATE.room, data: new_state, sender: UID})
+        }
+
+        STATE.old = new_state
+    }, 100)
 }
 
