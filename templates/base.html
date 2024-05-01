@@ -28,7 +28,7 @@
     {% block content %}{% endblock %}
 
     <!-- Elements -->
-    <template id="template__prompt">
+    <template id="template__prompt_note">
         <div class="modal__wrapper">
         <div class="modal">
             <div class="modal__header">
@@ -37,6 +37,41 @@
             </div>
             <div class="modal__description"></div>
             <textarea class="modal__input"></textarea>
+            <div class="modal__actions">
+                <div class="accept">Go</div>
+                <div class="deny">Cancel</div>
+            </div>
+        </div>
+    </div>
+    </template>
+
+    <template id="template__prompt_group">
+        <div class="modal__wrapper">
+        <div class="modal">
+            <div class="modal__header">
+                <span class="text">Testing</span>
+                <span class="close"><i class="fa-solid fa-times"></i></span>
+            </div>
+            <div class="modal__description"></div>
+            <input class="modal__input_type1" placeholder="Name of group">
+            <div class="modal__actions">
+                <div class="accept">Go</div>
+                <div class="deny">Cancel</div>
+            </div>
+        </div>
+    </div>
+    </template>
+
+    <template id="template__prompt_comparison">
+        <div class="modal__wrapper">
+        <div class="modal">
+            <div class="modal__header">
+                <span class="text">Testing</span>
+                <span class="close"><i class="fa-solid fa-times"></i></span>
+            </div>
+            <div class="modal__description"></div>
+            <input class="modal__input_type1" placeholder="Name of first section">
+            <input class="modal__input_type2" placeholder="Name of second section">
             <div class="modal__actions">
                 <div class="accept">Go</div>
                 <div class="deny">Cancel</div>

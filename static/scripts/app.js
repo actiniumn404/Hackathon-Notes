@@ -1,5 +1,5 @@
 let prompt = (data) => {
-    let elements = templates.prompt.content.cloneNode(true)
+    let elements = document.getElementById("template__prompt_" + data.type).content.cloneNode(true)
 
     elements.querySelector(".modal__header .text").textContent = data.header
 
@@ -9,16 +9,22 @@ let prompt = (data) => {
         elements.querySelector(".modal__description").textContent = data.description
     }
 
-    elements.querySelector(".modal__input").value = data.value ?? ""
-    elements.querySelector(".modal__input").placeholder = data.placeholder ?? ""
-
     document.body.append(elements)
 
     return new Promise((resolve, reject) => {
         document.querySelector(".modal:last-of-type .accept").onclick = (() => {
-            let value = document.querySelector(".modal .modal__input:last-of-type").value
+            let res = {}
+            if (data.type === "note"){
+                res["area"] = document.querySelector(".modal .modal__input:last-of-type").value
+            }
+            else if (data.type === "comparison"){
+                res["section1"] = document.querySelector(".modal .modal__input_type1").value
+                res["section2"] = document.querySelector(".modal .modal__input_type2").value
+            }else{
+                res["section1"] = document.querySelector(".modal .modal__input_type1").value
+            }
             document.querySelector(".modal__wrapper:last-of-type").remove()
-            resolve(value)
+            resolve(res)
         })
 
         document.querySelectorAll(".modal:last-of-type .close, .modal:last-of-type .deny").forEach(e=>e.onclick = (() => {
@@ -412,6 +418,7 @@ let events = {
                     }
 
                     if (node[1].classList.contains("clone")){
+                        console.log("GOOO")
                         finished = true
                         break
                     }
@@ -427,7 +434,11 @@ let events = {
                         document.querySelectorAll(".clone").forEach(e=>e.remove())
                         element.classList.add("clone")
                         element.style.order = curOrder - 1
-                        node[1].querySelector(".note_content").append(element)
+                        if (node[1].classList.contains("note") && STATE.drag.element.classList.contains("subnote")){
+                            node[1].querySelector(".note_content").append(element)
+                        }else{
+                            node[1].querySelector(".container-group-content").append(element)
+                        }
                     } else if (document.querySelector(".clone").parentElement === node[1].parentElement){
                         if (Number(document.querySelector(".clone").style.order) < curOrder){
                             document.querySelector(".clone").style.order = curOrder
@@ -575,6 +586,7 @@ let construct_subnote = (data) => {
 }
 
 let construct_from_root = (data) => {
+    document.querySelector("#workspace").innerHTML = ""
     // Metadata Setup
     document.querySelector("#workspace__name").value = data.name
 
@@ -626,6 +638,79 @@ let remove_obj = (cur, id) => {
             }
         }
     }
+}
+
+function random(min,max) {
+    return Math.floor((Math.random())*(max-min+1))+min;
+}
+
+function choose_id(){
+    let res = ""
+
+    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890"
+
+    for (let i = 0; i < 7; i++){
+        res += possible[random(0, possible.length - 1)]
+    }
+
+    return res
+}
+
+document.getElementById("addnote").onclick = async () => {
+    let res = await prompt({"header": "Add a note", type: "note"})
+    STATE.data.components.push(
+    {
+        "type": "Subnote",
+        "content": res.area,
+        "color": "green",
+        "id": choose_id(),
+        "y": 0,
+        "x": 0
+    })
+
+    construct_from_root(STATE.data)
+}
+
+document.getElementById("addgroup").onclick = async () => {
+    let res = await prompt({"header": "Add a group", type: "group"})
+    STATE.data.components.push(
+    {
+    "type": "Note",
+    "header": res.section1,
+    "color": "blue",
+    "id": choose_id(),
+    "children": [
+    ]})
+
+    construct_from_root(STATE.data)
+}
+
+document.getElementById("addcomparison").onclick = async () => {
+    let res = await prompt({"header": "Add a comparison", type: "comparison"})
+    STATE.data.components.push(
+    {
+    "type": "T-Chart",
+    "x": 0,
+    "y": 0,
+    "color": "blue",
+    "id": choose_id(),
+    "children": [
+        {
+            "type": "T-Chart Component",
+            "id": choose_id(),
+            "header": res.section1,
+            "children": []
+        },
+        {
+            "type": "T-Chart Component",
+            "header": res.section2,
+            "id": choose_id(),
+            "children": []
+        }
+    ]
+})
+
+    construct_from_root(STATE.data)
 }
 
 window.onload = () => {
