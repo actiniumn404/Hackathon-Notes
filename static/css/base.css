@@ -29,11 +29,27 @@ nav#nav{
     background: var(--light-background);
     padding: 20px var(--width-padding);
     font-family: var(--header-font);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#nav__right{
+    display: flex;
+    flex-direction: row;
+    font-size: 16px;
+    font-weight: 600;
+    column-gap: 10px;
+}
+
+#nav__right a{
+    color: black;
+    text-decoration: none;
 }
 
 #nav__logo{
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 900;
 }
 
 .modal__wrapper{

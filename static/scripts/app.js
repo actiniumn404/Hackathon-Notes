@@ -186,27 +186,29 @@ let events = {
         STATE.drag.element = undefined
     },
     "note_mousedown": (e) => {
+        let dimensions = e.currentTarget.getBoundingClientRect()
+        STATE.drag.offsetX = e.pageX - dimensions.left
+
+        STATE.drag.offsetY = e.pageY - dimensions.top
+
         let element = e.currentTarget.cloneNode(true)
         element.classList.add("original")
         e.currentTarget.classList.add("clone")
         Array.from(e.currentTarget.parentElement.children).at(-1).after(e.currentTarget)
         document.getElementById("workspace").append(element)
 
-        STATE.data.components.push(STATE.components[e.currentTarget.getAttribute("data-id")])
+        let id = e.currentTarget.getAttribute("data-id")
+        STATE.data.components.push(STATE.components[id])
 
         STATE.drag.orig = STATE.components[e.currentTarget.getAttribute("data-id")]
         STATE.components[e.currentTarget.getAttribute("data-id")] = STATE.data.components.at(-1)
 
         element = document.querySelector(".note.original:last-of-type")
-        let dimensions = e.currentTarget.getBoundingClientRect()
         STATE.drag.element = element
         STATE.drag.element.classList.add("dragged")
         e.currentTarget.id += "_C"
 
         declare_bounds()
-
-        STATE.drag.offsetX = e.pageX - dimensions.left
-        STATE.drag.offsetY = e.pageY - dimensions.top
 
         element.style.top = e.pageY - STATE.drag.offsetY + "px"
         element.style.left = e.pageX - STATE.drag.offsetX + "px"
@@ -214,13 +216,29 @@ let events = {
         e.stopPropagation()
 
         STATE.drag.find_overlaps = true
+
+        for (let e of STATE.data.components){
+            if (e.id === id){
+                STATE.drag.from_root = true
+                return
+            }
+        }
+        STATE.drag.from_root = false
     },
     "note_mouseup": (e) => {
         let clones = document.querySelectorAll(".clone")
 
         for (let i = 1; i < clones.length; i++){clones[i].remove()}
 
+        let name = clones[0].getAttribute("data-id")
+
         if (clones[0].style.display === "none"){ // direct child of "#workspace"
+            let temp = name
+            let id = clones[0].parentElement.parentElement.getAttribute("data-id")
+            let t = STATE.components[temp]
+            remove_obj(STATE.data, temp);
+            STATE.data.components.push(t)
+            clones[0].classList.remove("original")
             clones[0].remove()
         }else{
             clones[0].classList.remove("clone")
@@ -230,17 +248,42 @@ let events = {
             clones[0].style.left = ""
             clones[0].style.display = "block"
             clones[0].id = clones[0].id.substring(0, clones[0].id.length - 2)
-            STATE.components[clones[0].getAttribute("data-id")] = STATE.drag.orig
+            STATE.components[name] = STATE.drag.orig
             STATE.data.components.splice(STATE.data.components.length - 1, 1)
+
+            let temp = name
+            let id = clones[0].parentElement.parentElement.getAttribute("data-id")
+
+            let t = STATE.components[temp]
+            remove_obj(STATE.data, temp);
+            if (STATE.components[id]){
+                STATE.components[id].children.push(t)
+            }else {
+                STATE.data.components.push(t)
+            }
+
+            STATE.components[temp].x = undefined
+            STATE.components[temp].y = undefined
 
             STATE.drag.element.remove()
         }
+
+        document.getElementById("COMPONENT_" + name).classList.remove("original")
+        document.getElementById("COMPONENT_" + name).classList.remove("clone")
+        document.getElementById("COMPONENT_" + name).classList.remove("dragged")
+
+        document.getElementById("COMPONENT_" + name).style.clipPath = ""
 
         STATE.drag.element = undefined
 
         e.stopPropagation()
     },
     "subnote_mousedown": (e) => {
+        let dimensions = e.currentTarget.getBoundingClientRect()
+        STATE.drag.offsetX = e.pageX - dimensions.left
+
+        STATE.drag.offsetY = e.pageY - dimensions.top
+
         let element = e.currentTarget.cloneNode(true)
         element.classList.add("original")
         e.currentTarget.classList.add("clone")
@@ -253,15 +296,11 @@ let events = {
         STATE.components[e.currentTarget.getAttribute("data-id")] = STATE.data.components.at(-1)
 
         element = document.querySelector(".subnote.original:last-of-type")
-        let dimensions = e.currentTarget.getBoundingClientRect()
         STATE.drag.element = element
         STATE.drag.element.classList.add("dragged")
         e.currentTarget.id += "_C"
 
         declare_bounds()
-
-        STATE.drag.offsetX = e.pageX - dimensions.left
-        STATE.drag.offsetY = e.pageY - dimensions.top
 
         element.style.top = e.pageY - STATE.drag.offsetY + "px"
         element.style.left = e.pageX - STATE.drag.offsetX + "px"
@@ -275,7 +314,15 @@ let events = {
 
         for (let i = 1; i < clones.length; i++){clones[i].remove()}
 
+        let name = clones[0].getAttribute("data-id")
+
         if (clones[0].style.display === "none"){ // direct child of "#workspace"
+            let temp = name
+            let id = clones[0].parentElement.parentElement.getAttribute("data-id")
+            let t = STATE.components[temp]
+            remove_obj(STATE.data, temp);
+            STATE.data.components.push(t)
+            clones[0].classList.remove("original")
             clones[0].remove()
         }else{
             clones[0].classList.remove("clone")
@@ -285,11 +332,31 @@ let events = {
             clones[0].style.left = ""
             clones[0].style.display = "block"
             clones[0].id = clones[0].id.substring(0, clones[0].id.length - 2)
-            STATE.components[clones[0].getAttribute("data-id")] = STATE.drag.orig
+            STATE.components[name] = STATE.drag.orig
             STATE.data.components.splice(STATE.data.components.length - 1, 1)
+
+            let temp = name
+            let id = clones[0].parentElement.parentElement.getAttribute("data-id")
+
+            let t = STATE.components[temp]
+            remove_obj(STATE.data, temp);
+            if (STATE.components[id]){
+                STATE.components[id].children.push(t)
+            }else {
+                STATE.data.components.push(t)
+            }
+
+            STATE.components[temp].x = undefined
+            STATE.components[temp].y = undefined
 
             STATE.drag.element.remove()
         }
+
+        document.getElementById("COMPONENT_" + name).style.clipPath = ""
+
+        document.getElementById("COMPONENT_" + name).classList.remove("original")
+        document.getElementById("COMPONENT_" + name).classList.remove("clone")
+        document.getElementById("COMPONENT_" + name).classList.remove("dragged")
 
         STATE.drag.element = undefined
 
@@ -321,8 +388,8 @@ let events = {
             //STATE.drag.element.style.top = e.pageY - STATE.drag.offsetY + "px"
             //STATE.drag.element.style.left = e.pageX - STATE.drag.offsetX + "px"
             let id = STATE.drag.element.getAttribute("data-id")
-            STATE.components[id].y = STATE.viewpoint.y + e.pageY - STATE.drag.offsetY - STATE.drag.boundsTop
-            STATE.components[id].x = STATE.viewpoint.x + e.pageX - STATE.drag.offsetX - STATE.drag.boundsLeft
+            STATE.components[id].y = -STATE.viewpoint.y + e.pageY - STATE.drag.offsetY - STATE.drag.boundsTop
+            STATE.components[id].x = -STATE.viewpoint.x + e.pageX - STATE.drag.offsetX - STATE.drag.boundsLeft
 
             // Snap System
             if (STATE.drag.find_overlaps){
@@ -337,10 +404,13 @@ let events = {
                     order = [...res.note, ...res.container]
                 }
 
+
+
                 for (let node of order){
-                    if (node[1].parentElement.id === "workspace"){
+                    if (!check_element(node[1])){
                         continue
                     }
+
                     if (node[1].classList.contains("clone")){
                         finished = true
                         break
@@ -348,8 +418,17 @@ let events = {
 
                     let curOrder = Number(node[1].style.order)
 
-                    if (document.querySelector(".clone").parentElement === node[1].parentElement){
-                        console.log("Go")
+                    if (node[1].classList.contains("note") && STATE.drag.element.classList.contains("subnote") ||
+                        node[1].classList.contains("container") && STATE.drag.element.classList.contains("subnote") ||
+                        node[1].classList.contains("container") && STATE.drag.element.classList.contains("note")
+                    ){
+                        document.querySelector(".clone").style.display = "block"
+                        let element = document.querySelector(".clone").cloneNode(true)
+                        document.querySelectorAll(".clone").forEach(e=>e.remove())
+                        element.classList.add("clone")
+                        element.style.order = curOrder - 1
+                        node[1].querySelector(".note_content").append(element)
+                    } else if (document.querySelector(".clone").parentElement === node[1].parentElement){
                         if (Number(document.querySelector(".clone").style.order) < curOrder){
                             document.querySelector(".clone").style.order = curOrder
                         }else{
@@ -403,17 +482,6 @@ let regulate_position = (e, x, y) => {
     let right = Math.max((STATE.drag.boundsLeft + STATE.viewpoint.x + x + e.offsetWidth- STATE.drag.boundsRight), 0)
     let bottom = Math.max((STATE.drag.boundsTop + STATE.viewpoint.y + y + e.offsetHeight - STATE.drag.boundsBottom), 0)
     e.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px)`
-}
-
-let get_cookie = (cName) => {
-    const name = cName + "=";
-    const cDecoded = decodeURIComponent(document.cookie); //to be careful
-    const cArr = cDecoded.split('; ');
-    let res;
-    cArr.forEach(val => {
-        if (val.indexOf(name) === 0) res = val.substring(name.length);
-    })
-    return res
 }
 
 let construct_tchart = (data) => {
@@ -510,10 +578,13 @@ let construct_from_root = (data) => {
     // Metadata Setup
     document.querySelector("#workspace__name").value = data.name
 
-    console.log(data, data.components)
     // Construction
     for (let component of data.components){
         document.getElementById("workspace").append(construct(component))
+    }
+
+    for (let e of STATE.data.components){
+        regulate_position(document.getElementById("COMPONENT_" + e.id), e.x, e.y)
     }
 }
 
@@ -526,6 +597,34 @@ let construct = (data) => {
     }
     if (data.type === "Subnote"){
         return construct_subnote(data)
+    }
+}
+
+let remove_obj = (cur, id) => {
+    if (cur.children){
+        let index = 0;
+        while (index < cur.children.length){
+            let i = cur.children[index]
+            if (i.id === id){
+                cur.children.splice(index, 1)
+            }else{
+                remove_obj(i, id)
+                index += 1;
+            }
+        }
+    }
+
+    if (cur.components){
+        let index = 0;
+        while (index < cur.components.length){
+            let i = cur.components[index]
+            if (i.id === id){
+                cur.components.splice(index, 1)
+            }else{
+                remove_obj(i, id)
+                index += 1;
+            }
+        }
     }
 }
 

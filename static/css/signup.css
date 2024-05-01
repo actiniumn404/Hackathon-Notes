@@ -10,7 +10,6 @@ nav{
     flex-direction: column;
     row-gap: 20px;
     height: fit-content;
-    margin-top: 100px;
     border-radius: 4px;
     z-index: 5;
 }
@@ -38,7 +37,23 @@ body::after{
 #wrapper{
     flex: 1;
     display: flex;
-    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 5;
+}
+
+#wrapper > *:first-child{
+    margin-top: 100px;
+    margin-bottom: 20px;
+}
+
+#error{
+    width: 500px;
+    text-align: left;
+    background: lightpink;
+    padding: 10px;
+    border: 1px solid lightcoral;
+    border-radius: 4px;
 }
 
 h1{
