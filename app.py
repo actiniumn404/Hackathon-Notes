@@ -219,10 +219,16 @@ def socket_leave_room(data):
     if room not in STATE["USERS"]:
         STATE["USERS"][room] = []
 
-    try:
-        STATE["USERS"][room].remove(decoded)
-    except:
-        pass
+    res = []
+    seen = False
+
+    for element in STATE["USERS"][room]:
+        if not seen and element["username"] == decoded["username"]:
+            seen = True
+            continue
+        res.append(element)
+
+    STATE["USERS"][room] = res
 
     leave_room(room)
     emit("leave member", decoded, to=room)
@@ -235,6 +241,12 @@ def socket_emit(data):
         "name": data["room"],
         "data": json.loads(data["data"])
     })
+
+
+@socketio.on('delete users')
+def socket_emit(data):
+    STATE["USERS"][data] = []
+    emit("member list", STATE["USERS"][data], to=data)
 
 
 @socketio.on('connect')
