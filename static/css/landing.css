@@ -1,0 +1,103 @@
+#header{
+    background: #f1e8d5;
+    padding: 50px;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#header::after{
+    content: "";
+    background: url("../../static/notebooks.png");
+    background-size: 1000px;
+    opacity: 0.1;
+    position: absolute;
+    width: calc(100vw - 30px);
+    height: 50vh;
+    left: 0;
+    top: 64px;
+}
+
+#header h1{
+    font-size: 48px;
+    margin: 0;
+}
+
+#header h2{
+    font-size: 24px;
+    margin: 0;
+    text-align: center;
+}
+
+#content2, #content3, #content4, #content5{
+    padding: 50px calc(50vw - min(calc(100vw - 20px), 1200px) / 2 + 50px);
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    column-gap: 50px;
+    overflow: hidden;
+    flex-wrap: wrap;
+}
+
+#content2 .left, #content3 .right{
+    flex: 1;
+}
+
+#content2 img, #content3 img{
+    width: 500px;
+    box-shadow: 0 0 16px gold;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+#content2 img:hover, #content3 img:hover{
+    scale: 1.05;
+}
+
+#content3{
+    background: whitesmoke;
+}
+
+#content3 img{
+    box-shadow: 0 0 16px mediumseagreen;
+
+}
+
+#content4{
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#content5{
+    background: whitesmoke;
+}
+
+#content4 button{
+    padding: 20px;
+    font-size: 16px;
+    border: 0;
+    border-radius: 4px;
+    background: var(--light-background);
+    font-family: var(--header-font);
+    margin: auto;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#content4 button:hover{
+    box-shadow: 0 0 8px var(--highlight);
+}
+
+#content4 button:active{
+    box-shadow: 0 0 16px var(--highlight);
+}
+
+@media (max-width: 850px){
+    #content3 .right{
+        order: -1;
+    }
+}

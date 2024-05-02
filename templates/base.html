@@ -3,11 +3,11 @@
 <head>
     <link rel="stylesheet" href="{{ url_for("static", filename="css/base.css") }}" />
     <link rel="stylesheet" href="{{ url_for("static", filename="css/" + name +  ".css") }}" />
-    <link rel="icon" href="{{ url_for("static", filename="logo_dark.png") }}"/>
-    <title>{{ title }}</title>
+    <link rel="icon" href="{{ url_for("static", filename="book-solid.svg") }}"/>
+    <title>Notetaker | {{ name.capitalize() }}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0"><!-- Primary Meta Tags -->
-    <meta name="title" content=" ">
+    <meta name="title" content="Notetaker | {{ name }}">
     <meta name="description" content=" ">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -17,7 +17,7 @@
 <body {% block onbeforeunload %}{% endblock %}>
     <nav id="nav">
         <div id="nav__logo">
-            Notetaker
+            <a href="/">Notetaker</a>
         </div>
         {% if not NAME %}
         <div id="nav__right">
@@ -27,7 +27,8 @@
         </div>
         {% else %}
             <div id="nav__right">
-                <div><a href="/dashboard">{{ NAME }}: Dashboard</a></div>
+                <div><a href="javascript:null" style="font-weight: normal">Signed in as {{ NAME }}</a></div>
+                <div><a href="/dashboard">Dashboard</a></div>
             </div>
         {% endif %}
     </nav>

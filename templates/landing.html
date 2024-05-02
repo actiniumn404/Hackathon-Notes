@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+    <div id="header">
+        <h1>Notetaker</h1>
+        <h2>Does notetaking and making decisions have to be hard?</h2>
+    </div>
+    <div id="content2">
+        <div class="left">
+            <h1>Take Notes Effectively</h1>
+            <p>
+                Notetaker uses features like snapping and multiplayer to help you take notes and make decisions better.
+            </p>
+        </div>
+        <div class="right"><img src="{{ url_for('static', filename='newporthigh.jpeg') }}"></div>
+    </div>
+    <div id="content3">
+        <div class="left"><img src="{{ url_for('static', filename='addanote.jpeg') }}"></div>
+        <div class="right">
+            <h1>Organization is Our Passion</h1>
+            <p>
+                Notetaker uses has multiple organizational tools, such as groups and comparisons that allow you to reach
+                your notetaking potential.
+            </p>
+        </div>
+    </div>
+    <div id="content4">
+        <h1>Are you ready?</h1>
+        <a href="/signup"><button>Get Started</button></a>
+    </div>
+    <div id="content5">
+        <h1>Disclaimer</h1>
+        <p>
+            Notetaker is still in its prototype phase, and is not bug free. This is a prototype to show the potential of Notetaker. I can say for a fact that there are probably some bugs here. Regardless, please don't go bug hunting today. Maybe another day...just maybe.
+        </p>
+    </div>
+{% endblock %}

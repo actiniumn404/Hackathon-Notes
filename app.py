@@ -53,19 +53,32 @@ def page_home(room):
 
     return render_template("app.html", name="app", JWT=json.dumps(res), NAME=res["username"])
 
+@app.route('/')
+def page_landing():
+    res = check(request.cookies.get("jwt"))
+    if res:
+        return render_template("landing.html", name="landing", JWT=json.dumps(res), NAME=res["username"])
+    return render_template("landing.html", name="landing")
 
 @app.route('/signup')
 def page_signup():
+    res = check(request.cookies.get("jwt"))
+    if res:
+        return render_template("signup.html", name="signup", JWT=json.dumps(res), NAME=res["username"])
     return render_template("signup.html", name="signup")
 
 @app.route('/dashboard')
 def page_dashboard():
-    return render_template("signup.html", name="signup")
-
+    res = check(request.cookies.get("jwt"))
+    if res:
+        return render_template("dashboard.html", name="dashboard", JWT=json.dumps(res), NAME=res["username"])
+    return redirect("/signup")
 
 @app.route('/login')
 def page_login():
-
+    res = check(request.cookies.get("jwt"))
+    if res:
+        return render_template("login.html", name="login", JWT=json.dumps(res), NAME=res["username"])
     return render_template("login.html", name="login")
 
 

@@ -47,9 +47,11 @@ nav#nav{
     text-decoration: none;
 }
 
-#nav__logo{
+#nav__logo a{
     font-size: 18px;
     font-weight: 900;
+    color: black;
+    text-decoration: none;
 }
 
 .modal__wrapper{
